@@ -1,0 +1,64 @@
+.admin-login-page {
+    min-height: calc(100vh - 80px);
+    /* Subtract Navbar height */
+    display: flex;
+    align-items: center;
+}
+
+.center {
+    text-align: center;
+    margin: 0 auto;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.admin-panel-box {
+    padding: 3rem 2.5rem;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.05);
+    border-color: var(--border-color);
+    background: var(--bg-primary);
+}
+
+.admin-header {
+    margin-bottom: 2.5rem;
+}
+
+.admin-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    display: inline-block;
+    background: rgba(46, 204, 113, 0.1);
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    line-height: 80px;
+    border: 1px solid rgba(46, 204, 113, 0.3);
+}
+
+.admin-header h2 {
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+}
+
+.admin-header p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+.admin-form .input-group {
+    margin-bottom: 1.5rem;
+}
+
+.admin-form .btn {
+    padding: 1rem;
+    font-size: 1.1rem;
+    margin-top: 1rem;
+}
+
+@media (max-width: 600px) {
+    .admin-panel-box {
+        padding: 2.5rem 1.5rem;
+    }
+}

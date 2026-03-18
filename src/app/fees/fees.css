@@ -1,0 +1,71 @@
+.fees-page {
+    padding-top: 120px;
+    padding-bottom: 80px;
+}
+
+.fees-header {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.fees-header p {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin: 0.5rem auto 0;
+}
+
+/* IMAGE CONTAINER */
+.fees-image-container {
+    margin: 0 auto 60px;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* MAIN IMAGE */
+.fees-main-img {
+    width: 300px;        /* image ka main size */
+    height: auto;        /* automatic height */
+    object-fit: contain;
+    border-radius: 10px;
+    display: block;
+    margin: 0 auto;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+}
+
+/* NOTE SECTION */
+.fees-note {
+    padding: 2.5rem;
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.fees-note h3 {
+    color: var(--accent-primary);
+    margin-bottom: 1rem;
+}
+
+.contact-info-small {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 1.5rem;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+/* MOBILE RESPONSIVE */
+@media (max-width: 768px) {
+
+    .fees-main-img {
+        width: 230px;   /* mobile pe choti image */
+    }
+
+    .contact-info-small {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
