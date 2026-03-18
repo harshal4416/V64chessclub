@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/firebase';
+import admin from '@/lib/firebase';
 
 export async function GET() {
     try {
+        const db = admin.firestore();
         // Fetch all records, newest first
         const trialsSnapshot = await db.collection('FreeTrial').orderBy('createdAt', 'desc').get();
         const feedbacksSnapshot = await db.collection('Feedback').orderBy('createdAt', 'desc').get();
@@ -36,9 +37,9 @@ export async function GET() {
     }
 }
 
-export async function DELETE(request: Request) {
+export async function DELETE(req: Request) {
     try {
-        const { searchParams } = new URL(request.url);
+        const { searchParams } = new URL(req.url);
         const type = searchParams.get('type');
         const id = searchParams.get('id');
 
@@ -46,6 +47,7 @@ export async function DELETE(request: Request) {
             return NextResponse.json({ error: 'Missing type or id' }, { status: 400 });
         }
 
+        const db = admin.firestore();
         let collectionName = '';
         if (type === 'trial') collectionName = 'FreeTrial';
         else if (type === 'feedback') collectionName = 'Feedback';
@@ -65,14 +67,15 @@ export async function DELETE(request: Request) {
     }
 }
 
-export async function PATCH(request: Request) {
+export async function PATCH(req: Request) {
     try {
-        const { id, type, status } = await request.json();
+        const { id, type, status } = await req.json();
 
         if (!id || !type || !status) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
         }
 
+        const db = admin.firestore();
         let collectionName = '';
         if (type === 'trial') collectionName = 'FreeTrial';
         else if (type === 'admission') collectionName = 'Admissions';

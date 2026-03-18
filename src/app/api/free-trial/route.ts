@@ -1,10 +1,9 @@
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/firebase';
-import { Timestamp } from 'firebase-admin/firestore';
+import admin from '@/lib/firebase';
 
-export async function POST(request: Request) {
+export async function POST(req: Request) {
     try {
-        const { fullName, email, phone, country } = await request.json();
+        const { fullName, email, phone, country } = await req.json();
 
         if (!fullName || !email || !phone || !country) {
             return NextResponse.json(
@@ -22,6 +21,8 @@ export async function POST(request: Request) {
             );
         }
 
+        const db = admin.firestore();
+
         // Insert into Firestore
         await db.collection('FreeTrial').add({
             fullName,
@@ -29,7 +30,7 @@ export async function POST(request: Request) {
             phone: phoneDigits,
             country,
             status: 'Pending',
-            createdAt: Timestamp.now()
+            createdAt: admin.firestore.Timestamp.now()
         });
 
         return NextResponse.json(

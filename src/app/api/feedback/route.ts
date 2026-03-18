@@ -1,10 +1,9 @@
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/firebase';
-import { Timestamp } from 'firebase-admin/firestore';
+import admin from '@/lib/firebase';
 
-export async function POST(request: Request) {
+export async function POST(req: Request) {
     try {
-        const { name, email, message } = await request.json();
+        const { name, email, message } = await req.json();
 
         if (!name || !email || !message) {
             return NextResponse.json(
@@ -13,12 +12,14 @@ export async function POST(request: Request) {
             );
         }
 
+        const db = admin.firestore();
+
         // Insert into Firestore
         await db.collection('Feedback').add({
             name,
             email,
             message,
-            createdAt: Timestamp.now()
+            createdAt: admin.firestore.Timestamp.now()
         });
 
         return NextResponse.json(
