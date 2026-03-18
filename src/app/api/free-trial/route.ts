@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { getDb } from '@/lib/db';
+import { db } from '@/lib/firebase';
+import { Timestamp } from 'firebase-admin/firestore';
 
 export async function POST(request: Request) {
     try {
@@ -21,22 +22,20 @@ export async function POST(request: Request) {
             );
         }
 
-        const db = await getDb();
+        // Insert into Firestore
+        await db.collection('FreeTrial').add({
+            fullName,
+            email,
+            phone: phoneDigits,
+            country,
+            status: 'Pending',
+            createdAt: Timestamp.now()
+        });
 
-        // Insert into DB
-        const result = await db.run(
-            'INSERT INTO FreeTrial (fullName, email, phone, country) VALUES (?, ?, ?, ?)',
-            [fullName, email, phoneDigits, country]
+        return NextResponse.json(
+            { success: true, message: 'Free trial application submitted successfully' },
+            { status: 200 }
         );
-
-        if (result.changes === 1) {
-            return NextResponse.json(
-                { success: true, message: 'Free trial application submitted successfully' },
-                { status: 200 }
-            );
-        } else {
-            throw new Error('Failed to insert record');
-        }
     } catch (error) {
         console.error('Free Trial API error:', error);
         return NextResponse.json(

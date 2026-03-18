@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import './dashboard.css';
 
 type FreeTrial = {
-    id: number;
+    id: string;
     fullName: string;
     email: string;
     phone: string;
@@ -15,7 +15,7 @@ type FreeTrial = {
 };
 
 type Admission = {
-    id: number;
+    id: string;
     fullName: string;
     email: string;
     phone: string;
@@ -26,7 +26,7 @@ type Admission = {
 };
 
 type Feedback = {
-    id: number;
+    id: string;
     name: string;
     email: string;
     message: string;
@@ -40,7 +40,7 @@ export default function AdminDashboard() {
     const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
     const [admissions, setAdmissions] = useState<Admission[]>([]);
     const [loading, setLoading] = useState(true);
-    const [processingId, setProcessingId] = useState<number | null>(null);
+    const [processingId, setProcessingId] = useState<string | null>(null);
 
     useEffect(() => {
         const isAuth = localStorage.getItem('adminAuthorized');
@@ -87,7 +87,7 @@ export default function AdminDashboard() {
         setLoading(false);
     };
 
-    const handleStatusUpdate = async (id: number, type: 'trial' | 'admission', status: 'Accepted' | 'Rejected') => {
+    const handleStatusUpdate = async (id: string, type: 'trial' | 'admission', status: 'Accepted' | 'Rejected') => {
         if (!confirm(`Are you sure you want to change status to ${status}?`)) return;
 
         setProcessingId(id);
@@ -114,7 +114,7 @@ export default function AdminDashboard() {
         }
     };
 
-    const handleDelete = async (type: 'trial' | 'feedback' | 'admission', id: number) => {
+    const handleDelete = async (type: 'trial' | 'feedback' | 'admission', id: string) => {
         if (!confirm(`Are you sure you want to delete this ${type}?`)) return;
 
         try {
@@ -219,7 +219,7 @@ export default function AdminDashboard() {
                                 ) : (
                                     trials.map(t => (
                                         <tr key={t.id}>
-                                            <td>#{t.id}</td>
+                                            <td title={t.id}>#{t.id.slice(0, 6)}...</td>
                                             <td>{new Date(t.createdAt).toLocaleDateString()}</td>
                                             <td className="font-medium">{t.fullName}</td>
                                             <td><a href={`mailto:${t.email}`}>{t.email}</a></td>
@@ -268,7 +268,7 @@ export default function AdminDashboard() {
                                 ) : (
                                     admissions.map(a => (
                                         <tr key={a.id}>
-                                            <td>#{a.id}</td>
+                                            <td title={a.id}>#{a.id.slice(0, 6)}...</td>
                                             <td>{new Date(a.createdAt).toLocaleDateString()}</td>
                                             <td className="font-medium">{a.fullName}</td>
                                             <td>
@@ -323,7 +323,7 @@ export default function AdminDashboard() {
                                 ) : (
                                     feedbacks.map(f => (
                                         <tr key={f.id}>
-                                            <td>#{f.id}</td>
+                                            <td title={f.id}>#{f.id.slice(0, 6)}...</td>
                                             <td>{new Date(f.createdAt).toLocaleDateString()}</td>
                                             <td className="font-medium">{f.name}</td>
                                             <td><a href={`mailto:${f.email}`}>{f.email}</a></td>

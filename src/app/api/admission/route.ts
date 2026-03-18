@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { getDb } from '@/lib/db';
+import { db } from '@/lib/firebase';
+import { Timestamp } from 'firebase-admin/firestore';
 import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
@@ -30,11 +31,16 @@ export async function POST(request: Request) {
 
         const relativePath = `/uploads/admissions/${filename}`;
 
-        const db = await getDb();
-        await db.run(
-            'INSERT INTO Admissions (fullName, email, phone, country, paymentScreenshot) VALUES (?, ?, ?, ?, ?)',
-            [fullName, email, phone, country, relativePath]
-        );
+        // Insert into Firestore
+        await db.collection('Admissions').add({
+            fullName,
+            email,
+            phone,
+            country,
+            paymentScreenshot: relativePath,
+            status: 'Pending',
+            createdAt: Timestamp.now()
+        });
 
         return NextResponse.json({ success: true, message: 'Admission application submitted successfully' }, { status: 201 });
     } catch (error) {

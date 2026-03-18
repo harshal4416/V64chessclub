@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { getDb } from '@/lib/db';
+import { db } from '@/lib/firebase';
+import { Timestamp } from 'firebase-admin/firestore';
 
 export async function POST(request: Request) {
     try {
@@ -12,22 +13,18 @@ export async function POST(request: Request) {
             );
         }
 
-        const db = await getDb();
+        // Insert into Firestore
+        await db.collection('Feedback').add({
+            name,
+            email,
+            message,
+            createdAt: Timestamp.now()
+        });
 
-        // Insert into DB
-        const result = await db.run(
-            'INSERT INTO Feedback (name, email, message) VALUES (?, ?, ?)',
-            [name, email, message]
+        return NextResponse.json(
+            { success: true, message: 'Feedback submitted successfully' },
+            { status: 200 }
         );
-
-        if (result.changes === 1) {
-            return NextResponse.json(
-                { success: true, message: 'Feedback submitted successfully' },
-                { status: 200 }
-            );
-        } else {
-            throw new Error('Failed to insert record');
-        }
     } catch (error) {
         console.error('Feedback API error:', error);
         return NextResponse.json(
