@@ -4,10 +4,10 @@ import admin from '@/lib/firebase';
 export async function GET() {
     try {
         const db = admin.firestore();
-        // Fetch all records, newest first
+        // 🔹 Correct collection names (case-sensitive)
         const trialsSnapshot = await db.collection('FreeTrial').orderBy('createdAt', 'desc').get();
         const feedbacksSnapshot = await db.collection('Feedback').orderBy('createdAt', 'desc').get();
-        const admissionsSnapshot = await db.collection('Admissions').orderBy('createdAt', 'desc').get();
+        const admissionsSnapshot = await db.collection('admissions').orderBy('createdAt', 'desc').get(); // fixed lowercase
 
         const trials = trialsSnapshot.docs.map(doc => ({
             id: doc.id,
@@ -27,13 +27,11 @@ export async function GET() {
             createdAt: doc.data().createdAt?.toDate?.()?.toISOString() || doc.data().createdAt
         }));
 
+        // 🔹 Return in expected keys
         return NextResponse.json({ trials, feedbacks, admissions }, { status: 200 });
     } catch (error) {
         console.error('Admin Fetch error:', error);
-        return NextResponse.json(
-            { error: 'Internal server error' },
-            { status: 500 }
-        );
+        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }
 
@@ -51,19 +49,14 @@ export async function DELETE(req: Request) {
         let collectionName = '';
         if (type === 'trial') collectionName = 'FreeTrial';
         else if (type === 'feedback') collectionName = 'Feedback';
-        else if (type === 'admission') collectionName = 'Admissions';
+        else if (type === 'admission') collectionName = 'admissions'; // fixed lowercase
         else return NextResponse.json({ error: 'Invalid type' }, { status: 400 });
 
         await db.collection(collectionName).doc(id).delete();
-
         return NextResponse.json({ success: true }, { status: 200 });
-
     } catch (error) {
         console.error('Admin Delete error:', error);
-        return NextResponse.json(
-            { error: 'Internal server error' },
-            { status: 500 }
-        );
+        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }
 
@@ -78,7 +71,7 @@ export async function PATCH(req: Request) {
         const db = admin.firestore();
         let collectionName = '';
         if (type === 'trial') collectionName = 'FreeTrial';
-        else if (type === 'admission') collectionName = 'Admissions';
+        else if (type === 'admission') collectionName = 'admissions'; // fixed lowercase
         else return NextResponse.json({ error: 'Invalid type' }, { status: 400 });
 
         const docRef = db.collection(collectionName).doc(id);
@@ -102,12 +95,8 @@ export async function PATCH(req: Request) {
         }
 
         return NextResponse.json({ success: true, status }, { status: 200 });
-
     } catch (error) {
         console.error('Admin Patch error:', error);
-        return NextResponse.json(
-            { error: 'Internal server error' },
-            { status: 500 }
-        );
+        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }
