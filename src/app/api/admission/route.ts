@@ -1,51 +1,44 @@
-import { NextResponse } from 'next/server';
-import admin from '@/lib/firebase';
-import { writeFile, mkdir } from 'fs/promises';
-import path from 'path';
-import { v4 as uuidv4 } from 'uuid';
+import { NextResponse } from "next/server";
+import admin from "@/lib/firebase";
 
 export async function POST(req: Request) {
     try {
         const formData = await req.formData();
-        const fullName = formData.get('fullName') as string;
-        const email = formData.get('email') as string;
-        const phone = formData.get('phone') as string;
-        const country = formData.get('country') as string;
-        const paymentScreenshot = formData.get('paymentScreenshot') as File;
+
+        const fullName = formData.get("fullName") as string;
+        const email = formData.get("email") as string;
+        const phone = formData.get("phone") as string;
+        const country = formData.get("country") as string;
+        const paymentScreenshot = formData.get("paymentScreenshot") as File;
 
         if (!fullName || !email || !phone || !country || !paymentScreenshot) {
-            return NextResponse.json({ error: 'All fields are required' }, { status: 400 });
+            return NextResponse.json(
+                { error: "All fields are required" },
+                { status: 400 }
+            );
         }
-
-        // Save file to public/uploads/admissions
-        const bytes = await paymentScreenshot.arrayBuffer();
-        const buffer = Buffer.from(bytes);
-
-        const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'admissions');
-        await mkdir(uploadDir, { recursive: true });
-
-        const filename = `${uuidv4()}-${paymentScreenshot.name.replace(/\s+/g, '_')}`;
-        const filepath = path.join(uploadDir, filename);
-        await writeFile(filepath, buffer);
-
-        const relativePath = `/uploads/admissions/${filename}`;
 
         const db = admin.firestore();
 
-        // Insert into Firestore
-        await db.collection('Admissions').add({
+        await db.collection("admissions").add({
             fullName,
             email,
             phone,
             country,
-            paymentScreenshot: relativePath,
-            status: 'Pending',
-            createdAt: admin.firestore.Timestamp.now()
+            paymentScreenshot: paymentScreenshot.name,
+            status: "Pending",
+            createdAt: admin.firestore.Timestamp.now(),
         });
 
-        return NextResponse.json({ success: true, message: 'Admission application submitted successfully' }, { status: 201 });
+        return NextResponse.json(
+            { success: true, message: "Admission submitted successfully" },
+            { status: 201 }
+        );
     } catch (error) {
-        console.error('Admission submission error:', error);
-        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+        console.error("Admission API Error:", error);
+        return NextResponse.json(
+            { error: "Internal Server Error" },
+            { status: 500 }
+        );
     }
 }
