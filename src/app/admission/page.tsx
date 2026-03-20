@@ -1,8 +1,6 @@
 "use client";
 
-import { useState, useRef } from 'react';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
+import { useState } from 'react';
 import './admission.css';
 
 export default function AdmissionPage() {
@@ -15,17 +13,6 @@ export default function AdmissionPage() {
     const [file, setFile] = useState<File | null>(null);
     const [submitting, setSubmitting] = useState(false);
     const [message, setMessage] = useState({ type: '', text: '' });
-    const [receiptData, setReceiptData] = useState<{
-        name: string;
-        email: string;
-        date: string;
-        receiptId: string;
-        amount: string;
-        course: string;
-    } | null>(null);
-    const [formSubmitted, setFormSubmitted] = useState(false);
-    const [paymentSuccess, setPaymentSuccess] = useState(false);
-    const receiptRef = useRef<HTMLDivElement>(null);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -59,19 +46,7 @@ export default function AdmissionPage() {
             });
 
             if (res.ok) {
-                const rData = {
-                    name: formData.fullName,
-                    email: formData.email,
-                    date: new Date().toLocaleDateString(),
-                    receiptId: `V64-${Date.now()}`,
-                    amount: "₹500",
-                    course: "Chess Training"
-                };
-                setReceiptData(rData);
-                setFormSubmitted(true);
-                // Placeholder for future Razorpay integration:
-                // After form is submitted, we show the payment step.
-                // handlePaymentSuccess() would be called by the payment gateway.
+                setMessage({ type: 'success', text: 'Application Submitted Successfully' });
                 setFormData({ fullName: '', email: '', phone: '', country: '' });
                 setFile(null);
             } else {
@@ -85,34 +60,6 @@ export default function AdmissionPage() {
         }
     };
 
-    // Placeholder function for future Razorpay integration
-    const handlePaymentSuccess = () => {
-        // This function will be called by the Razorpay 'handler' callback
-        // Once called, the receipt will be rendered and available for download
-        setPaymentSuccess(true);
-    };
-
-    const handleDownloadReceipt = async () => {
-        if (!receiptRef.current) return;
-        try {
-            const canvas = await html2canvas(receiptRef.current, {
-                scale: 2,
-                useCORS: true,
-                backgroundColor: '#ffffff'
-            });
-            const imgData = canvas.toDataURL('image/png');
-            const pdf = new jsPDF('p', 'mm', 'a4');
-            const pdfWidth = pdf.internal.pageSize.getWidth();
-            const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-
-            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-            pdf.save('V64-Receipt.pdf');
-        } catch (error) {
-            console.error('Receipt generation error:', error);
-            alert('Failed to generate receipt PDF. Please try again.');
-        }
-    };
-
     return (
         <div className="admission-page">
             <div className="container">
@@ -123,211 +70,82 @@ export default function AdmissionPage() {
 
                 <div className="admission-grid">
                     <div className="admission-form-container glass-panel">
-                        {!formSubmitted ? (
-                            <form onSubmit={handleSubmit} className="admission-form">
-                                <div className="form-group">
-                                    <label htmlFor="fullName">Full Name</label>
-                                    <input
-                                        type="text"
-                                        id="fullName"
-                                        name="fullName"
-                                        value={formData.fullName}
-                                        onChange={handleInputChange}
-                                        required
-                                        placeholder="Enter your full name"
-                                    />
-                                </div>
-
-                                <div className="form-group">
-                                    <label htmlFor="email">Email Address</label>
-                                    <input
-                                        type="email"
-                                        id="email"
-                                        name="email"
-                                        value={formData.email}
-                                        onChange={handleInputChange}
-                                        required
-                                        placeholder="Enter your email"
-                                    />
-                                </div>
-
-                                <div className="form-group">
-                                    <label htmlFor="phone">Phone Number</label>
-                                    <input
-                                        type="tel"
-                                        id="phone"
-                                        name="phone"
-                                        value={formData.phone}
-                                        onChange={handleInputChange}
-                                        required
-                                        placeholder="Enter your phone number"
-                                    />
-                                </div>
-
-                                <div className="form-group">
-                                    <label htmlFor="country">Country</label>
-                                    <input
-                                        type="text"
-                                        id="country"
-                                        name="country"
-                                        value={formData.country}
-                                        onChange={handleInputChange}
-                                        required
-                                        placeholder="Enter your country"
-                                    />
-                                </div>
-
-                                <div className="form-group">
-                                    <label htmlFor="paymentScreenshot">Upload Payment Screenshot</label>
-                                    <input
-                                        type="file"
-                                        id="paymentScreenshot"
-                                        name="paymentScreenshot"
-                                        onChange={handleFileChange}
-                                        accept="image/*"
-                                        required
-                                    />
-                                    <small className="form-help">Please upload a screenshot of your payment confirmation.</small>
-                                </div>
-
-                                <button type="submit" className="btn btn-primary full-width" disabled={submitting}>
-                                    {submitting ? 'Submitting...' : 'Submit Application'}
-                                </button>
-
-                                {message.text && (
-                                    <div className={`form-message ${message.type}`}>
-                                        {message.text}
-                                    </div>
-                                )}
-                            </form>
-                        ) : !paymentSuccess ? (
-                            <div className="payment-confirmation-step animate-fade-in text-center" style={{ padding: '2rem 1rem' }}>
-                                <div className="success-icon" style={{ fontSize: '3.5rem', marginBottom: '1rem' }}>🎉</div>
-                                <h2 style={{ marginBottom: '1rem', color: '#fff' }}>Application Received!</h2>
-                                <p style={{ color: '#aaa', marginBottom: '2rem', lineHeight: '1.6' }}>
-                                    Your details have been recorded. To complete your admission and generate an official receipt, please ensure your payment is successful.
-                                </p>
-
-                                <div className="payment-action-box" style={{
-                                    padding: '2rem',
-                                    background: 'rgba(255, 255, 255, 0.03)',
-                                    borderRadius: '12px',
-                                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                                    marginBottom: '1.5rem'
-                                }}>
-                                    <button
-                                        onClick={() => setMessage({ type: 'info', text: 'Receipt will be available after successful payment verification' })}
-                                        className="btn btn-primary full-width"
-                                        style={{ padding: '12px' }}
-                                    >
-                                        Proceed to Payment
-                                    </button>
-
-                                    {message.text && (
-                                        <div className={`form-message ${message.type}`} style={{ marginTop: '1rem' }}>
-                                            {message.text}
-                                        </div>
-                                    )}
-                                </div>
-
-                                <button
-                                    onClick={() => { setFormSubmitted(false); setMessage({ type: '', text: '' }); }}
-                                    className="btn-link"
-                                    style={{
-                                        background: 'transparent',
-                                        color: '#888',
-                                        border: 'none',
-                                        cursor: 'pointer',
-                                        fontSize: '0.9rem',
-                                        textDecoration: 'underline'
-                                    }}
-                                >
-                                    Go Back to Form
-                                </button>
+                        <form onSubmit={handleSubmit} className="admission-form">
+                            <div className="form-group">
+                                <label htmlFor="fullName">Full Name</label>
+                                <input
+                                    type="text"
+                                    id="fullName"
+                                    name="fullName"
+                                    value={formData.fullName}
+                                    onChange={handleInputChange}
+                                    required
+                                    placeholder="Enter your full name"
+                                />
                             </div>
-                        ) : (
-                            <div className="receipt-display-step animate-fade-in">
-                                <div className="success-banner text-center mb-3" style={{
-                                    color: '#10b981',
-                                    fontWeight: 700,
-                                    background: 'rgba(16, 185, 129, 0.1)',
-                                    padding: '10px',
-                                    borderRadius: '6px'
-                                }}>
-                                    Payment Verified Successfully! ✅
-                                </div>
-                                {receiptData && (
-                                    <div className="receipt-container">
-                                        <div ref={receiptRef} className="receipt-card" style={{
-                                            background: '#ffffff',
-                                            color: '#1a1a1a',
-                                            padding: '2rem',
-                                            borderRadius: '8px',
-                                            boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
-                                            border: '1px solid #eee'
-                                        }}>
-                                            <div className="receipt-header" style={{ borderBottom: '2px solid #f0f0f0', paddingBottom: '1rem', marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                                    <img src="/logo.jpeg" alt="V64chessclub Logo" style={{ width: '50px', borderRadius: '4px' }} />
-                                                    <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 800, color: '#1a1a1a' }}>V64<span style={{ color: '#ebc351' }}>chessclub</span></h2>
-                                                </div>
-                                                <div style={{ textAlign: 'right' }}>
-                                                    <h3 style={{ margin: 0, color: '#333' }}>RECEIPT</h3>
-                                                    <span style={{ fontSize: '0.8rem', color: '#666' }}>{receiptData.receiptId}</span>
-                                                </div>
-                                            </div>
 
-                                            <div className="receipt-details" style={{ display: 'grid', gap: '12px' }}>
-                                                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                                    <span style={{ color: '#666' }}>Date:</span>
-                                                    <strong style={{ color: '#1a1a1a' }}>{receiptData.date}</strong>
-                                                </div>
-                                                <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #f9f9f9', paddingTop: '8px' }}>
-                                                    <span style={{ color: '#666' }}>Student:</span>
-                                                    <strong style={{ color: '#1a1a1a' }}>{receiptData.name}</strong>
-                                                </div>
-                                                <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #f9f9f9', paddingTop: '8px' }}>
-                                                    <span style={{ color: '#666' }}>Email:</span>
-                                                    <strong style={{ color: '#1a1a1a' }}>{receiptData.email}</strong>
-                                                </div>
-                                                <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #f9f9f9', paddingTop: '8px' }}>
-                                                    <span style={{ color: '#666' }}>Course:</span>
-                                                    <strong style={{ color: '#1a1a1a' }}>{receiptData.course}</strong>
-                                                </div>
-                                                <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid #f9f9f9', paddingTop: '8px', marginTop: '10px' }}>
-                                                    <span style={{ color: '#666', fontSize: '1.1rem' }}>Amount Paid:</span>
-                                                    <strong style={{ color: '#1a1a1a', fontSize: '1.1rem' }}>{receiptData.amount}</strong>
-                                                </div>
-                                                <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '2px solid #f0f0f0', paddingTop: '12px', marginTop: '5px' }}>
-                                                    <span style={{ color: '#666' }}>Status:</span>
-                                                    <strong style={{ color: '#10b981' }}>Paid ✅</strong>
-                                                </div>
-                                            </div>
-
-                                            <div className="receipt-footer" style={{ marginTop: '2.5rem', textAlign: 'center', fontSize: '0.85rem', color: '#666' }}>
-                                                <p style={{ margin: '4px 0' }}>Founder & Director: Vaibhav Badgujar</p>
-                                                <p style={{ margin: '4px 0', fontStyle: 'italic' }}>Thank you for joining our academy!</p>
-                                            </div>
-                                        </div>
-
-                                        <button
-                                            onClick={handleDownloadReceipt}
-                                            className="btn btn-secondary full-width mt-2"
-                                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
-                                        >
-                                            📄 Download Receipt (PDF)
-                                        </button>
-                                        <button
-                                            onClick={() => { setFormSubmitted(false); setPaymentSuccess(false); }}
-                                            className="btn btn-link full-width mt-2"
-                                            style={{ background: 'transparent', color: '#aaa', border: 'none', cursor: 'pointer', textAlign: 'center' }}
-                                        >
-                                            Return to Form
-                                        </button>
-                                    </div>
-                                )}
+                            <div className="form-group">
+                                <label htmlFor="email">Email Address</label>
+                                <input
+                                    type="email"
+                                    id="email"
+                                    name="email"
+                                    value={formData.email}
+                                    onChange={handleInputChange}
+                                    required
+                                    placeholder="Enter your email"
+                                />
                             </div>
-                        )}
+
+                            <div className="form-group">
+                                <label htmlFor="phone">Phone Number</label>
+                                <input
+                                    type="tel"
+                                    id="phone"
+                                    name="phone"
+                                    value={formData.phone}
+                                    onChange={handleInputChange}
+                                    required
+                                    placeholder="Enter your phone number"
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label htmlFor="country">Country</label>
+                                <input
+                                    type="text"
+                                    id="country"
+                                    name="country"
+                                    value={formData.country}
+                                    onChange={handleInputChange}
+                                    required
+                                    placeholder="Enter your country"
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label htmlFor="paymentScreenshot">Upload Payment Screenshot</label>
+                                <input
+                                    type="file"
+                                    id="paymentScreenshot"
+                                    name="paymentScreenshot"
+                                    onChange={handleFileChange}
+                                    accept="image/*"
+                                    required
+                                />
+                                <small className="form-help">Please upload a screenshot of your payment confirmation.</small>
+                            </div>
+
+                            <button type="submit" className="btn btn-primary full-width" disabled={submitting}>
+                                {submitting ? 'Submitting...' : 'Submit Application'}
+                            </button>
+
+                            {message.text && (
+                                <div className={`form-message ${message.text === 'Application Submitted Successfully' ? 'success' : 'error'}`}>
+                                    {message.text}
+                                </div>
+                            )}
+                        </form>
                     </div>
 
                     <div className="payment-details-container glass-panel">
