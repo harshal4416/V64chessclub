@@ -48,9 +48,9 @@ export default function Home() {
             <div className="hero-stats">
               <div className="stat">
                 <span className="stat-value">
-                  <Counter end={50} suffix="+" />
+                  <Counter end={10} suffix="+" />
                 </span>
-                <span className="stat-label">Grandmasters</span>
+                <span className="stat-label">Fide Rated Coaches</span>
               </div>
               <div className="stat">
                 <span className="stat-value">
@@ -100,7 +100,7 @@ export default function Home() {
             <div className="glass-panel feature-card">
               <div className="feature-icon">♛</div>
               <h3>Elite Coaching</h3>
-              <p>Train under the guidance of FIDE rated Grandmasters tailored to your specific playing style and weaknesses.</p>
+              <p>Train under the guidance of Fide rated Coaches tailored to your specific playing style and weaknesses.</p>
             </div>
 
             <div className="glass-panel feature-card">
