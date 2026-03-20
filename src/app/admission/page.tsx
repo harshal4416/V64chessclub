@@ -69,6 +69,9 @@ export default function AdmissionPage() {
                 };
                 setReceiptData(rData);
                 setFormSubmitted(true);
+                // Placeholder for future Razorpay integration:
+                // After form is submitted, we show the payment step.
+                // handlePaymentSuccess() would be called by the payment gateway.
                 setFormData({ fullName: '', email: '', phone: '', country: '' });
                 setFile(null);
             } else {
@@ -80,6 +83,13 @@ export default function AdmissionPage() {
         } finally {
             setSubmitting(false);
         }
+    };
+
+    // Placeholder function for future Razorpay integration
+    const handlePaymentSuccess = () => {
+        // This function will be called by the Razorpay 'handler' callback
+        // Once called, the receipt will be rendered and available for download
+        setPaymentSuccess(true);
     };
 
     const handleDownloadReceipt = async () => {
@@ -205,20 +215,23 @@ export default function AdmissionPage() {
                                     border: '1px solid rgba(255, 255, 255, 0.1)',
                                     marginBottom: '1.5rem'
                                 }}>
-                                    <p style={{ fontWeight: 600, color: '#fff', marginBottom: '1.2rem', fontSize: '1.1rem' }}>
-                                        Have you completed the payment?
-                                    </p>
                                     <button
-                                        onClick={() => setPaymentSuccess(true)}
+                                        onClick={() => setMessage({ type: 'info', text: 'Receipt will be available after successful payment verification' })}
                                         className="btn btn-primary full-width"
                                         style={{ padding: '12px' }}
                                     >
-                                        Yes, I've Paid. Generate Receipt
+                                        Proceed to Payment
                                     </button>
+
+                                    {message.text && (
+                                        <div className={`form-message ${message.type}`} style={{ marginTop: '1rem' }}>
+                                            {message.text}
+                                        </div>
+                                    )}
                                 </div>
 
                                 <button
-                                    onClick={() => setFormSubmitted(false)}
+                                    onClick={() => { setFormSubmitted(false); setMessage({ type: '', text: '' }); }}
                                     className="btn-link"
                                     style={{
                                         background: 'transparent',
