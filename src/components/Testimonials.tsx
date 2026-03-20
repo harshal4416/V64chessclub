@@ -9,7 +9,7 @@ const testimonials = [
         image: "/testimonials/mayur.jpeg"
     },
     {
-        name: "Sanskar Badgujar",
+        name: "Sanskar Pawar",
         country: "Jalgaon",
         text: "Amazing training and support from the coaches. Because of the structured lession and practice games, I reached a 1585 rating and improved my tournment performance.",
         image: "/testimonials/sanskar.png"
