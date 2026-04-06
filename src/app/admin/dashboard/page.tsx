@@ -20,7 +20,8 @@ type Admission = {
     email: string;
     phone: string;
     country: string;
-    paymentScreenshot: string;
+    paymentScreenshot?: string;
+    proofUrl?: string;
     status: 'Pending' | 'Accepted' | 'Rejected';
     createdAt: string;
 };
@@ -276,7 +277,7 @@ export default function AdminDashboard() {
                                                 <small>{a.phone}</small>
                                             </td>
                                             <td>
-                                                <a href={a.paymentScreenshot} target="_blank" rel="noopener noreferrer" className="view-link">
+                                                <a href={a.proofUrl || a.paymentScreenshot} target="_blank" rel="noopener noreferrer" className="view-link">
                                                     👁 View Proof
                                                 </a>
                                             </td>

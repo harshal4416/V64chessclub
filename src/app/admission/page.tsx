@@ -3,6 +3,28 @@
 import { useState } from 'react';
 import './admission.css';
 
+const uploadToCloudinary = async (file: File): Promise<string | null> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'chessclub_upload'); // Unsigned upload preset
+
+    try {
+        const res = await fetch('https://api.cloudinary.com/v1_1/dps7bjjrk/image/upload', {
+            method: 'POST',
+            body: formData,
+        });
+        const data = await res.json();
+        if (data.secure_url) {
+            return data.secure_url;
+        }
+        console.error('Cloudinary response error:', data);
+        return null;
+    } catch (error) {
+        console.error('Cloudinary upload error:', error);
+        return null;
+    }
+};
+
 export default function AdmissionPage() {
     const [formData, setFormData] = useState({
         fullName: '',
@@ -43,13 +65,24 @@ export default function AdmissionPage() {
         }
 
         try {
+            let proofUrl = '';
+            if (file) {
+                const uploadedUrl = await uploadToCloudinary(file);
+                if (!uploadedUrl) {
+                    setMessage({ type: 'error', text: 'Image upload to Cloudinary failed.' });
+                    setSubmitting(false);
+                    return;
+                }
+                proofUrl = uploadedUrl;
+            }
+
             const formDataToSend = new FormData();
             formDataToSend.append('fullName', formData.fullName);
             formDataToSend.append('email', formData.email);
             formDataToSend.append('phone', formData.phone);
             formDataToSend.append('country', formData.country);
-            if (file) {
-                formDataToSend.append('paymentScreenshot', file);
+            if (proofUrl) {
+                formDataToSend.append('proofUrl', proofUrl);
             }
 
             const res = await fetch('/api/admission', {

@@ -9,9 +9,9 @@ export async function POST(req: Request) {
         const email = formData.get("email") as string;
         const phone = formData.get("phone") as string;
         const country = formData.get("country") as string;
-        const paymentScreenshot = formData.get("paymentScreenshot") as File;
+        const proofUrl = formData.get("proofUrl") as string;
 
-        if (!fullName || !email || !phone || !country || !paymentScreenshot) {
+        if (!fullName || !email || !phone || !country || !proofUrl) {
             return NextResponse.json(
                 { error: "All fields are required" },
                 { status: 400 }
@@ -25,7 +25,7 @@ export async function POST(req: Request) {
             email,
             phone,
             country,
-            paymentScreenshot: paymentScreenshot.name,
+            proofUrl,
             status: "Pending",
             createdAt: admin.firestore.Timestamp.now(),
         });
