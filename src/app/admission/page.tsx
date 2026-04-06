@@ -42,8 +42,26 @@ export default function AdmissionPage() {
     };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setMessage({ type: '', text: '' });
         if (e.target.files && e.target.files[0]) {
-            setFile(e.target.files[0]);
+            const selectedFile = e.target.files[0];
+
+            const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+            if (!allowedTypes.includes(selectedFile.type)) {
+                setMessage({ type: 'error', text: 'Only image files (PNG, JPG, JPEG) are allowed.' });
+                setFile(null);
+                e.target.value = '';
+                return;
+            }
+
+            if (selectedFile.size > 2 * 1024 * 1024) {
+                setMessage({ type: 'error', text: 'File size must be less than 2MB.' });
+                setFile(null);
+                e.target.value = '';
+                return;
+            }
+
+            setFile(selectedFile);
         }
     };
 
