@@ -30,6 +30,18 @@ export default function AdmissionPage() {
         setSubmitting(true);
         setMessage({ type: '', text: '' });
 
+        if (!/^\d+$/.test(formData.phone)) {
+            setMessage({ type: 'error', text: 'Mobile number must contain only numeric values (0-9).' });
+            setSubmitting(false);
+            return;
+        }
+
+        if (formData.phone.length !== 10) {
+            setMessage({ type: 'error', text: 'Mobile number must be exactly 10 digits.' });
+            setSubmitting(false);
+            return;
+        }
+
         try {
             const formDataToSend = new FormData();
             formDataToSend.append('fullName', formData.fullName);
